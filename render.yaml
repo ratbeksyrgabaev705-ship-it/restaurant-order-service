@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: restaurant-order-service
+    name: aga-ini-restaurant
     runtime: docker
     plan: free
     healthCheckPath: /
@@ -11,7 +11,3 @@ services:
         sync: false
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-    disk:
-      name: restaurant-data
-      mountPath: /app/data
-      sizeGB: 1
