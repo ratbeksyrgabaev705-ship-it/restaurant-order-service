@@ -849,18 +849,8 @@
     let currentLanguage =
         localStorage.getItem("customerLanguage") || "ky";
 
-    function roundQuantity(value) {
-        return Math.round(Number(value || 0) * 10) / 10;
-    }
-
     function formatQuantity(value) {
-        const rounded = roundQuantity(value);
-
-        if (Number.isInteger(rounded)) {
-            return String(rounded);
-        }
-
-        return rounded.toFixed(1).replace(/\.0$/, "");
+        return String(Math.max(0, Math.round(Number(value || 0))));
     }
 
     let cart = [];
@@ -1060,9 +1050,7 @@
             const totalQuantity =
                 cart.reduce(
                     (sum, item) =>
-                        roundQuantity(
-                            sum + Number(item.quantity || 0)
-                        ),
+                        sum + Math.round(Number(item.quantity || 0)),
                     0
                 );
 
@@ -1096,7 +1084,7 @@
 
             formData.append(
                 "quantity",
-                String(Math.max(1, Math.round(totalQuantity)))
+                String(totalQuantity)
             );
 
             formData.append(
