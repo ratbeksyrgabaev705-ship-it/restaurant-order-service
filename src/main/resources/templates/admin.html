@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        :root {
+            --blue: #2563eb;
+            --green: #16a34a;
+            --orange: #ea580c;
+            --purple: #7c3aed;
+            --red: #dc2626;
+            --dark: #111827;
+            --muted: #6b7280;
+            --line: #e5e7eb;
+            --bg: #f5f6fa;
+            --white: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--dark);
+        }
+
+        button {
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .layout {
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 265px;
+            padding: 20px 14px;
+            background: var(--white);
+            border-right: 1px solid var(--line);
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 8px 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white;
+            font-size: 22px;
+        }
+
+        .logo-title {
+            font-weight: 900;
+        }
+
+        .logo-subtitle {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .nav {
+            display: grid;
+            gap: 7px;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #374151;
+            text-align: left;
+            font-weight: 800;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eff6ff;
+            color: var(--blue);
+        }
+
+        .nav-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: #f3f4f6;
+        }
+
+        .badge {
+            min-width: 23px;
+            margin-left: auto;
+            padding: 5px 7px;
+            border-radius: 20px;
+            background: var(--red);
+            color: white;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .main {
+            min-height: 100vh;
+            margin-left: 265px;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 70px;
+            padding: 12px 25px;
+            background: white;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .page-title {
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+        .page-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .refresh-button {
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: white;
+            font-size: 17px;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 17px;
+            padding: 11px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .filter-button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--muted);
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .filter-button.active {
+            background: #eff6ff;
+            color: var(--blue);
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .order-card {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: white;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .order-number {
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .order-time {
+            margin-top: 4px;
+            color: var(--red);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status {
+            height: fit-content;
+            padding: 7px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .status-new {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .status-accepted {
+            background: #eff6ff;
+            color: var(--blue);
+        }
+
+        .status-cooking {
+            background: #fff7ed;
+            color: var(--orange);
+        }
+
+        .status-ready {
+            background: #f5f3ff;
+            color: var(--purple);
+        }
+
+        .status-courier {
+            background: #ecfeff;
+            color: #0891b2;
+        }
+
+        .status-delivered {
+            background: #f0fdf4;
+            color: var(--green);
+        }
+
+        .status-cancelled {
+            background: #fef2f2;
+            color: var(--red);
+        }
+
+        .status-paid {
+            background: #f0fdf4;
+            color: var(--green);
+        }
+
+        .status-waiting {
+            background: #fff7ed;
+            color: var(--orange);
+        }
+
+        .order-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .receipt-tag {
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .receipt-tag.ok {
+            color: var(--green);
+        }
+
+        .receipt-tag.missing {
+            color: var(--red);
+        }
+
+        .order-body {
+            padding: 16px;
+        }
+
+        .info {
+            display: grid;
+            gap: 8px;
+            color: #374151;
+            font-size: 12px;
+        }
+
+        .food-box {
+            margin: 14px 0;
+            padding: 13px 0;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .food-name {
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .food-quantity {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .total-price {
+            color: var(--blue);
+            font-size: 15px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 0 16px 16px;
+        }
+
+        .action-button {
+            min-height: 42px;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: white;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .green {
+            border-color: var(--green);
+            background: var(--green);
+            color: white;
+        }
+
+        .orange {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: white;
+        }
+
+        .blue {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+        }
+
+        .purple {
+            border-color: var(--purple);
+            background: var(--purple);
+            color: white;
+        }
+
+        .red {
+            border-color: #fecaca;
+            color: var(--red);
+        }
+
+        .state {
+            grid-column: 1 / -1;
+            padding: 45px 20px;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: white;
+            text-align: center;
+        }
+
+        .state-icon {
+            font-size: 42px;
+        }
+
+        .state-title {
+            margin-top: 12px;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .state-text {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .detail-card,
+        .report-card {
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: white;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .detail-box {
+            padding: 13px;
+            border-radius: 11px;
+            background: #f8fafc;
+        }
+
+        .detail-label {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .detail-value {
+            margin-top: 5px;
+            font-size: 13px;
+            font-weight: 900;
+            word-break: break-word;
+        }
+
+        .receipt {
+            display: block;
+            width: 100%;
+            max-height: 500px;
+            margin-top: 15px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .detail-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+            margin-top: 16px;
+        }
+
+        .back-button {
+            margin-bottom: 13px;
+            border: none;
+            background: transparent;
+            font-weight: 900;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 15px;
+        }
+
+        .report-value {
+            margin-top: 8px;
+            font-size: 25px;
+            font-weight: 900;
+        }
+
+        .sold-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 100;
+            display: none;
+            max-width: 340px;
+            padding: 13px 16px;
+            border-radius: 11px;
+            background: var(--dark);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @media (max-width: 850px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                border-right: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .nav {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .orders-grid,
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .content {
+                padding: 13px;
+            }
+
+            .nav {
+                grid-template-columns: 1fr;
+            }
+
+            .actions,
+            .detail-actions,
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .report-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .report-mode-button {
+            padding: 11px 15px;
+            border: none;
+            border-radius: 10px;
+            background: #f3f4f6;
+            color: #374151;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .report-mode-button.active {
+            background: var(--blue);
+            color: white;
+        }
+
+        .report-controls {
+            margin-bottom: 15px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .report-controls.hidden {
+            display: none;
+        }
+
+        .report-controls label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .report-control-row {
+            display: flex;
+            gap: 9px;
+        }
+
+        .report-control-row input {
+            flex: 1;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: white;
+            font: inherit;
+        }
+
+        .report-control-row button {
+            min-height: 44px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--blue);
+            color: white;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .report-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .report-summary-card {
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: white;
+        }
+
+        .report-summary-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .report-summary-value {
+            margin-top: 8px;
+            font-size: 22px;
+            font-weight: 900;
+            word-break: break-word;
+        }
+
+        .report-section-title {
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .month-days {
+            display: grid;
+            gap: 8px;
+        }
+
+        .month-day-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #f1f5f9;
+            border-radius: 11px;
+            background: #fafafa;
+        }
+
+        .month-day-row button {
+            padding: 8px 11px;
+            border: none;
+            border-radius: 9px;
+            background: var(--blue);
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .report-order-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .report-order {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: white;
+        }
+
+        @media (max-width: 1000px) {
+            .report-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .month-day-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .report-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-control-row {
+                flex-direction: column;
+            }
+
+            .month-day-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🍽</div>
+            <div>
+                <div class="logo-title">Админ панель</div>
+                <div class="logo-subtitle">ФОРТУНА рестораны</div>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <button id="navOrders" class="nav-button active" onclick="showScreen('orders')">
+                <span class="nav-icon">🔔</span>
+                Жаңы заказдар
+                <span id="newBadge" class="badge">0</span>
+            </button>
+
+            <button id="navHistory" class="nav-button" onclick="showScreen('history')">
+                <span class="nav-icon">🧾</span>
+                Заказдар тарыхы
+            </button>
+
+            <button id="navReport" class="nav-button" onclick="showScreen('report')">
+                <span class="nav-icon">📊</span>
+                Отчеттор
+            </button>
+
+            <button class="nav-button" onclick="window.location.href='/admin-menu'">
+                <span class="nav-icon">🍴</span>
+                Меню башкаруу
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <div id="pageTitle" class="page-title">Жаңы заказдар</div>
+                <div id="pageSubtitle" class="page-subtitle">
+                    Ресторанга түшкөн активдүү заказдар
+                </div>
+            </div>
+
+            <button class="refresh-button" onclick="refreshScreen()">🔄</button>
+        </header>
+
+        <div class="content">
+
+            <section id="ordersScreen" class="screen active">
+                <div class="filters">
+                    <button class="filter-button active" onclick="setFilter('ALL', this)">Баары</button>
+                    <button class="filter-button" onclick="setFilter('NEW', this)">Жаңы</button>
+                    <button class="filter-button" onclick="setFilter('ACCEPTED', this)">Кабыл алынды</button>
+                    <button class="filter-button" onclick="setFilter('COOKING', this)">Даярдалууда</button>
+                    <button class="filter-button" onclick="setFilter('READY', this)">Даяр</button>
+                    <button class="filter-button" onclick="setFilter('GIVEN_TO_COURIER', this)">Курьерде</button>
+                </div>
+
+                <div id="ordersContainer" class="orders-grid"></div>
+            </section>
+
+            <section id="historyScreen" class="screen">
+                <div id="historyContainer" class="orders-grid"></div>
+            </section>
+
+            <section id="detailScreen" class="screen">
+                <button class="back-button" onclick="showScreen(previousScreen)">← Артка</button>
+                <div id="detailContainer"></div>
+            </section>
+
+            <section id="reportScreen" class="screen">
+
+                <div class="report-toolbar">
+                    <button
+                            id="todayReportButton"
+                            class="report-mode-button active"
+                            onclick="selectReportMode('today')"
+                    >
+                        Бүгүнкү отчет
+                    </button>
+
+                    <button
+                            id="dailyReportButton"
+                            class="report-mode-button"
+                            onclick="selectReportMode('daily')"
+                    >
+                        Күн боюнча
+                    </button>
+
+                    <button
+                            id="monthlyReportButton"
+                            class="report-mode-button"
+                            onclick="selectReportMode('monthly')"
+                    >
+                        Айлык отчет
+                    </button>
+                </div>
+
+                <div id="dailyReportControls" class="report-controls hidden">
+                    <label for="dailyReportDate">Датаны тандаңыз</label>
+
+                    <div class="report-control-row">
+                        <input id="dailyReportDate" type="date">
+
+                        <button onclick="loadSelectedDailyReport()">
+                            Отчетту ачуу
+                        </button>
+                    </div>
+                </div>
+
+                <div id="monthlyReportControls" class="report-controls hidden">
+                    <label for="monthlyReportMonth">Айды тандаңыз</label>
+
+                    <div class="report-control-row">
+                        <input id="monthlyReportMonth" type="month">
+
+                        <button onclick="loadSelectedMonthlyReport()">
+                            Айлык отчетту ачуу
+                        </button>
+                    </div>
+                </div>
+
+                <div id="reportContainer"></div>
+
+                <div id="reportOrdersContainer"></div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    let activeOrders = [];
+    let historyOrders = [];
+    let currentFilter = 'ALL';
+    let currentScreen = 'orders';
+    let previousScreen = 'orders';
+    let selectedOrder = null;
+    let currentReportMode = 'today';
+    let lastNewOrderCount = 0;
+    let ordersLoadedOnce = false;
+
+    const screenInfo = {
+        orders: ['Жаңы заказдар', 'Ресторанга түшкөн активдүү заказдар'],
+        history: ['Заказдар тарыхы', 'Жеткирилген жана жокко чыгарылган заказдар'],
+        detail: ['Заказдын маалыматы', 'Кардар жана төлөм тууралуу толук маалымат'],
+        report: ['Отчеттор', 'Күндүк жана айлык сатуу статистикасы']
+    };
+
+    function showScreen(name) {
+        if (name === 'detail') {
+            previousScreen = currentScreen;
+        }
+
+        currentScreen = name;
+
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        document.getElementById(name + 'Screen').classList.add('active');
+
+        const info = screenInfo[name];
+        document.getElementById('pageTitle').textContent = info[0];
+        document.getElementById('pageSubtitle').textContent = info[1];
+
+        if (name === 'orders') {
+            document.getElementById('navOrders').classList.add('active');
+            loadActiveOrders();
+        }
+
+        if (name === 'history') {
+            document.getElementById('navHistory').classList.add('active');
+            loadHistory();
+        }
+
+        if (name === 'report') {
+            document.getElementById('navReport').classList.add('active');
+            loadReport();
+        }
+
+        if (name === 'detail') {
+            renderDetail();
+        }
+
+        window.scrollTo(0, 0);
+    }    function refreshScreen() {
+        if (currentScreen === 'history') {
+            loadHistory();
+            return;
+        }
+
+        if (currentScreen === 'report') {
+            loadReport();
+            return;
+        }
+
+        loadActiveOrders();
+    }
+
+    function setFilter(filter, button) {
+        currentFilter = filter;
+
+        document.querySelectorAll('.filter-button').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        button.classList.add('active');
+        renderActiveOrders();
+    }
+
+    async function loadActiveOrders(silent) {
+        if (!silent) {
+            showLoading('ordersContainer', 'Заказдар жүктөлүүдө');
+        }
+
+        try {
+            const response = await fetch('/orders/active');
+
+            if (!response.ok) {
+                throw new Error('Заказдарды алуу мүмкүн болгон жок');
+            }
+
+            activeOrders = await response.json();
+
+            const newCount = activeOrders.filter(order => {
+                return order.orderStatus === 'NEW';
+            }).length;
+
+            if (ordersLoadedOnce && newCount > lastNewOrderCount) {
+                notifyNewOrder(newCount - lastNewOrderCount);
+            }
+
+            lastNewOrderCount = newCount;
+            ordersLoadedOnce = true;
+
+            updateBadge();
+            renderActiveOrders();
+
+        } catch (error) {
+            if (!silent) {
+                showError('ordersContainer', error.message);
+            }
+        }
+    }
+
+    function renderActiveOrders() {
+        const container = document.getElementById('ordersContainer');
+
+        const orders = activeOrders.filter(order => {
+            return currentFilter === 'ALL'
+                || order.orderStatus === currentFilter;
+        });
+
+        renderCards(container, orders, 'active');
+    }
+
+    async function loadHistory() {
+        showLoading('historyContainer', 'Тарых жүктөлүүдө');
+
+        try {
+            const response = await fetch('/orders');
+
+            if (!response.ok) {
+                throw new Error('Тарыхты алуу мүмкүн болгон жок');
+            }
+
+            const allOrders = await response.json();
+
+            historyOrders = allOrders
+                .filter(order => {
+                    return order.orderStatus === 'DELIVERED'
+                        || order.orderStatus === 'CANCELLED';
+                })
+                .sort((a, b) => Number(b.id) - Number(a.id));
+
+            renderCards(
+                document.getElementById('historyContainer'),
+                historyOrders,
+                'history'
+            );
+
+        } catch (error) {
+            showError('historyContainer', error.message);
+        }
+    }
+
+    function renderCards(container, orders, source) {
+        if (!orders || orders.length === 0) {
+            container.innerHTML = `
+                <div class="state">
+                    <div class="state-icon">📭</div>
+                    <div class="state-title">Заказ табылган жок</div>
+                    <div class="state-text">Бул бөлүм азырынча бош.</div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = orders.map(order => {
+            const status = order.orderStatus || 'NEW';
+
+            return `
+                <article class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-number">№${escapeHtml(order.id)}</div>
+                            <div class="order-time">${formatDate(order.createdAt)}</div>
+                        </div>
+
+                        <div class="order-tags">
+                            <span class="status ${statusClass(status)}">
+                                ${statusText(status)}
+                            </span>
+                            <span class="status ${paymentStatusClass(order.paymentStatus)}">
+                                ${paymentStatusText(order.paymentStatus)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="order-body">
+                        <div class="info">
+                            <div>👤 ${escapeHtml(order.customerName || 'Аты жок')}</div>
+                            <div>📞 ${escapeHtml(order.phone || 'Номер жок')}</div>
+                            <div>📍 ${escapeHtml(order.address || 'Дарек жок')}</div>
+                        </div>
+
+                        <div class="receipt-tag ${hasValidReceipt(order.receiptImagePath) ? 'ok' : 'missing'}">
+                            ${hasValidReceipt(order.receiptImagePath)
+                                ? '✅ Чек жүктөлгөн'
+                                : '⚠️ Чек жок'}
+                        </div>
+
+                        <div class="food-box">
+                            <div class="food-name">
+                                🍲 ${escapeHtml(order.itemName || 'Тамак')}
+                            </div>
+
+                            <div class="food-quantity">
+                                ${Number(order.quantity || 0)} порция
+                            </div>
+                        </div>
+
+                        <div class="total-row">
+                            <span>Жалпы сумма:</span>
+                            <span class="total-price">
+                                ${money(order.totalPrice)} сом
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button
+                                class="action-button"
+                                onclick="openDetail(${Number(order.id)}, '${source}')"
+                        >
+                            🧾 Чекти көрүү
+                        </button>
+
+                        ${mainButton(order)}
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+   function mainButton(order) {
+
+    const id = Number(order.id);
+    const status = order.orderStatus || 'NEW';
+
+
+    if (status === 'NEW') {
+
+        return actionButton(
+            id,
+            'accept',
+            'Кабыл алуу',
+            'green'
+        );
+
+    }
+
+
+    if (status === 'ACCEPTED') {
+
+        return actionButton(
+            id,
+            'cook',
+            'Даярдоо',
+            'orange'
+        );
+
+    }
+
+
+    if (status === 'COOKING') {
+
+        return actionButton(
+            id,
+            'ready',
+            'Даяр болду',
+            'blue'
+        );
+
+    }
+
+
+    if (status === 'READY') {
+
+        return actionButton(
+            id,
+            'courier',
+            'Курьерге берүү',
+            'purple'
+        );
+
+    }
+
+
+    if (status === 'GIVEN_TO_COURIER') {
+
+        return actionButton(
+            id,
+            'deliver',
+            'Жеткирилди',
+            'green'
+        );
+
+    }
+
+
+    return `
+        <button class="action-button" disabled>
+            ${statusText(status)}
+        </button>
+    `;
+}
+
+    function actionButton(id, endpoint, text, className) {
+        return `
+            <button
+                    class="action-button ${className}"
+                    onclick="changeStatus(${id}, '${endpoint}')"
+            >
+                ${text}
+            </button>
+        `;
+    }
+
+    function openDetail(id, source) {
+        const orders = source === 'history'
+            ? historyOrders
+            : activeOrders;
+
+        selectedOrder = orders.find(order => {
+            return Number(order.id) === Number(id);
+        });
+
+        if (!selectedOrder) {
+            showToast('Заказ табылган жок');
+            return;
+        }
+
+        previousScreen = source === 'history'
+            ? 'history'
+            : 'orders';
+
+        showScreen('detail');
+    }
+
+    function renderDetail() {
+        const container = document.getElementById('detailContainer');
+
+        if (!selectedOrder) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const order = selectedOrder;
+
+        const hasReceipt = hasValidReceipt(order.receiptImagePath);
+
+        const receiptUrl = hasReceipt
+            ? (
+                order.receiptImagePath.startsWith('/')
+                    ? order.receiptImagePath
+                    : '/' + order.receiptImagePath
+            )
+            : '';
+
+        container.innerHTML = `
+            <div class="detail-card">
+                <div class="total-row">
+                    <div class="order-number">Заказ №${escapeHtml(order.id)}</div>
+
+                    <span class="status ${statusClass(order.orderStatus)}">
+                        ${statusText(order.orderStatus)}
+                    </span>
+                </div>
+
+                <div class="detail-grid">
+                    ${detailBox('Кардардын аты', order.customerName)}
+                    ${detailBox('Телефон', order.phone)}
+                    ${detailBox('Дарек', order.address)}
+                    ${detailBox('Комментарий', order.comment || 'Комментарий жок')}
+                    ${detailBox('Тамактар', order.itemName)}
+                    ${detailBox('Порция', Number(order.quantity || 0))}
+                    ${detailBox('Жалпы сумма', money(order.totalPrice) + ' сом')}
+                    ${detailBox('Төлөнгөн сумма', money(order.paymentAmount) + ' сом')}
+                    ${detailBox('Төлөм статусу', paymentStatusText(order.paymentStatus))}
+                </div>
+
+                ${
+                    hasReceipt
+                        ? `
+                            <a href="${escapeHtml(receiptUrl)}" target="_blank">
+                                <img
+                                        class="receipt"
+                                        src="${escapeHtml(receiptUrl)}"
+                                        alt="Төлөм чеги"
+                                >
+                            </a>
+                        `
+                        : `
+                            <div class="state">
+                                <div class="state-icon">🧾</div>
+                                <div class="state-title">Чек жүктөлгөн эмес</div>
+                            </div>
+                        `
+                }
+
+                ${
+                    order.orderStatus !== 'DELIVERED'
+                    && order.orderStatus !== 'CANCELLED'
+                        ? `
+                            <div class="detail-actions">
+                                <button
+                                        class="action-button red"
+                                        onclick="changeStatus(
+                                            ${Number(order.id)},
+                                            'cancel'
+                                        )"
+                                >
+                                    ✕ Четке кагуу
+                                </button>
+
+                                ${mainButton(order)}
+                            </div>
+                        `
+                        : ''
+                }
+            </div>
+        `;
+    }
+
+    function detailBox(label, value) {
+        return `
+            <div class="detail-box">
+                <div class="detail-label">${escapeHtml(label)}</div>
+                <div class="detail-value">${escapeHtml(value ?? '')}</div>
+            </div>
+        `;
+    }
+
+    async function changeStatus(id, endpoint) {
+        const confirmed = confirm('Статусту өзгөртөсүзбү?');
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                '/orders/' + id + '/' + endpoint,
+                { method: 'PUT' }
+            );
+
+            if (!response.ok) {
+                throw new Error('Статус өзгөргөн жок');
+            }
+
+            selectedOrder = await response.json();
+
+            showToast('Статус өзгөртүлдү');
+
+            if (
+                selectedOrder.orderStatus === 'DELIVERED'
+                || selectedOrder.orderStatus === 'CANCELLED'
+            ) {
+                showScreen('history');
+                return;
+            }
+
+            if (currentScreen === 'detail') {
+                renderDetail();
+            } else {
+                loadActiveOrders();
+            }
+
+        } catch (error) {
+            showToast(error.message);
+        }
+    }
+
+    function bishkekDateString() {
+        const parts = new Intl.DateTimeFormat(
+            'en-CA',
+            {
+                timeZone: 'Asia/Bishkek',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }
+        ).formatToParts(new Date());
+
+        const values = {};
+
+        parts.forEach(part => {
+            values[part.type] = part.value;
+        });
+
+        return (
+            values.year
+            + '-'
+            + values.month
+            + '-'
+            + values.day
+        );
+    }
+
+    function bishkekMonthString() {
+        return bishkekDateString().slice(0, 7);
+    }
+
+    function initializeReportInputs() {
+        document.getElementById('dailyReportDate').value =
+            bishkekDateString();
+
+        document.getElementById('monthlyReportMonth').value =
+            bishkekMonthString();
+    }
+
+    function selectReportMode(mode) {
+        currentReportMode = mode;
+
+        document.querySelectorAll('.report-mode-button')
+            .forEach(button => button.classList.remove('active'));
+
+        document.getElementById(
+            mode === 'today'
+                ? 'todayReportButton'
+                : mode === 'daily'
+                    ? 'dailyReportButton'
+                    : 'monthlyReportButton'
+        ).classList.add('active');
+
+        document.getElementById('dailyReportControls')
+            .classList.toggle('hidden', mode !== 'daily');
+
+        document.getElementById('monthlyReportControls')
+            .classList.toggle('hidden', mode !== 'monthly');
+
+        document.getElementById('reportOrdersContainer').innerHTML = '';
+
+        if (mode === 'today') {
+            loadTodayReport();
+        }
+
+        if (mode === 'daily') {
+            loadSelectedDailyReport();
+        }
+
+        if (mode === 'monthly') {
+            loadSelectedMonthlyReport();
+        }
+    }
+
+    async function loadReport() {
+        initializeReportInputs();
+        selectReportMode(currentReportMode || 'today');
+    }
+
+    async function loadTodayReport() {
+        await fetchAndRenderReport(
+            '/reports/today',
+            'Бүгүнкү отчет'
+        );
+    }
+
+    async function loadSelectedDailyReport() {
+        const date =
+            document.getElementById('dailyReportDate').value;
+
+        if (!date) {
+            showToast('Датаны тандаңыз');
+            return;
+        }
+
+        await fetchAndRenderReport(
+            '/reports/daily?date=' + encodeURIComponent(date),
+            'Күндүк отчет'
+        );
+    }
+
+    async function loadSelectedMonthlyReport() {
+        const monthValue =
+            document.getElementById('monthlyReportMonth').value;
+
+        if (!monthValue) {
+            showToast('Айды тандаңыз');
+            return;
+        }
+
+        const [year, month] =
+            monthValue.split('-').map(Number);
+
+        showLoading(
+            'reportContainer',
+            'Айлык отчет жүктөлүүдө'
+        );
+
+        document.getElementById('reportOrdersContainer').innerHTML = '';
+
+        try {
+            const response = await fetch(
+                '/reports/monthly?year='
+                + year
+                + '&month='
+                + month
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    'Айлык отчетту алуу мүмкүн болгон жок'
+                );
+            }
+
+            const report = await response.json();
+
+            renderMonthlyReport(report);
+
+        } catch (error) {
+            showError(
+                'reportContainer',
+                error.message
+            );
+        }
+    }
+
+    async function fetchAndRenderReport(url, title) {
+        showLoading(
+            'reportContainer',
+            'Отчет жүктөлүүдө'
+        );
+
+        document.getElementById('reportOrdersContainer').innerHTML = '';
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(
+                    'Отчетту алуу мүмкүн болгон жок'
+                );
+            }
+
+            const report = await response.json();
+
+            renderDailyReport(report, title);
+
+        } catch (error) {
+            showError(
+                'reportContainer',
+                error.message
+            );
+        }
+    }
+
+    function renderSummaryCards(report) {
+        return `
+            <div class="report-summary-grid">
+
+                <div class="report-summary-card">
+                    <div class="report-summary-label">
+                        🧾 Заказдар
+                    </div>
+
+                    <div class="report-summary-value">
+                        ${Number(report.totalOrders || 0)}
+                    </div>
+                </div>
+
+                <div class="report-summary-card">
+                    <div class="report-summary-label">
+                        🍽 Порциялар
+                    </div>
+
+                    <div class="report-summary-value">
+                        ${Number(report.totalQuantity || 0)}
+                    </div>
+                </div>
+
+                <div class="report-summary-card">
+                    <div class="report-summary-label">
+                        💰 Киреше
+                    </div>
+
+                    <div class="report-summary-value">
+                        ${money(report.totalRevenue)} сом
+                    </div>
+                </div>
+
+                <div class="report-summary-card">
+                    <div class="report-summary-label">
+                        🧮 Орточо чек
+                    </div>
+
+                    <div class="report-summary-value">
+                        ${money(report.averageOrderAmount)} сом
+                    </div>
+                </div>
+
+                <div class="report-summary-card">
+                    <div class="report-summary-label">
+                        ⭐ Эң популярдуу
+                    </div>
+
+                    <div class="report-summary-value">
+                        ${escapeHtml(
+                            report.topItem
+                            || 'Маалымат жок'
+                        )}
+                    </div>
+                </div>
+
+            </div>
+        `;
+    }
+
+    function renderSoldItems(soldItems) {
+        const items = soldItems || {};
+        const names = Object.keys(items);
+
+        if (names.length === 0) {
+            return `
+                <div class="state">
+                    <div class="state-icon">🍽</div>
+                    <div class="state-title">
+                        Сатылган тамак азырынча жок
+                    </div>
+                </div>
+            `;
+        }
+
+        return names.map(name => `
+            <div class="sold-row">
+                <strong>${escapeHtml(name)}</strong>
+                <strong>
+                    ${Number(items[name] || 0)} порция
+                </strong>
+            </div>
+        `).join('');
+    }
+
+    function renderDailyReport(report, title) {
+        document.getElementById('reportContainer').innerHTML = `
+            ${renderSummaryCards(report)}
+
+            <div class="report-card">
+                <div class="report-section-title">
+                    ${escapeHtml(title)}
+                    — ${escapeHtml(report.date || '')}
+                </div>
+
+                ${renderSoldItems(report.soldItems)}
+            </div>
+        `;
+
+        renderReportOrders(
+            report.orders || [],
+            report.date || ''
+        );
+    }
+
+    function renderMonthlyReport(report) {
+        const dailyReports =
+            Array.isArray(report.dailyReports)
+                ? report.dailyReports
+                : [];
+
+        const daysHtml = dailyReports.map(day => `
+            <div class="month-day-row">
+                <strong>${escapeHtml(day.date)}</strong>
+
+                <span>
+                    🧾 ${Number(day.totalOrders || 0)} заказ
+                </span>
+
+                <span>
+                    🍽 ${Number(day.totalQuantity || 0)} порция
+                </span>
+
+                <strong>
+                    💰 ${money(day.totalRevenue)} сом
+                </strong>
+
+                <button
+                        onclick="openReportDay(
+                            '${escapeHtml(day.date)}'
+                        )"
+                >
+                    Ачуу
+                </button>
+            </div>
+        `).join('');
+
+        document.getElementById('reportContainer').innerHTML = `
+            ${renderSummaryCards(report)}
+
+            <div class="report-card">
+                <div class="report-section-title">
+                    ${escapeHtml(report.monthName || '')}
+                    ${Number(report.year || 0)}
+                    — сатылган тамактар
+                </div>
+
+                ${renderSoldItems(report.soldItems)}
+            </div>
+
+            <div class="report-card" style="margin-top:15px;">
+                <div class="report-section-title">
+                    Күндөр боюнча отчет
+                </div>
+
+                <div class="month-days">
+                    ${daysHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    async function openReportDay(date) {
+        document.getElementById('dailyReportDate').value = date;
+
+        showLoading(
+            'reportOrdersContainer',
+            'Күндүн заказдары жүктөлүүдө'
+        );
+
+        try {
+            const response = await fetch(
+                '/reports/daily-orders?date='
+                + encodeURIComponent(date)
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    'Күндүн заказдарын алуу мүмкүн болгон жок'
+                );
+            }
+
+            const orders = await response.json();
+
+            renderReportOrders(orders, date);
+
+            document.getElementById('reportOrdersContainer')
+                .scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+        } catch (error) {
+            showError(
+                'reportOrdersContainer',
+                error.message
+            );
+        }
+    }
+
+    function renderReportOrders(orders, date) {
+        const container =
+            document.getElementById('reportOrdersContainer');
+
+        if (!orders || orders.length === 0) {
+            container.innerHTML = `
+                <div class="report-card" style="margin-top:15px;">
+                    <div class="state">
+                        <div class="state-icon">📭</div>
+                        <div class="state-title">
+                            ${escapeHtml(date)} күнү заказ жок
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="report-card" style="margin-top:15px;">
+                <div class="report-section-title">
+                    ${escapeHtml(date)} күнүнүн заказдары
+                </div>
+
+                <div class="report-order-list">
+                    ${orders.map(order => `
+                        <div class="report-order">
+                            <div class="total-row">
+                                <strong>
+                                    №${escapeHtml(order.id)}
+                                </strong>
+
+                                <strong>
+                                    ${money(order.totalPrice)} сом
+                                </strong>
+                            </div>
+
+                            <div style="margin-top:8px;">
+                                ${escapeHtml(
+                                    order.itemName || 'Тамак'
+                                )}
+                            </div>
+
+                            <div class="state-text">
+                                ${formatDate(order.createdAt)}
+                                · ${Number(order.quantity || 0)}
+                                порция
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    function updateBadge() {
+        const count = activeOrders.filter(order => {
+            return order.orderStatus === 'NEW';
+        }).length;
+
+        document.getElementById('newBadge').textContent = count;
+    }
+
+    function hasValidReceipt(path) {
+        return Boolean(
+            path
+            && String(path).startsWith('/uploads/')
+        );
+    }
+
+    function statusText(status) {
+        const values = {
+            NEW: 'Жаңы заказ',
+            ACCEPTED: 'Кабыл алынды',
+            COOKING: 'Даярдалууда',
+            READY: 'Даяр болду',
+            GIVEN_TO_COURIER: 'Курьерге берилди',
+            DELIVERED: 'Жеткирилди',
+            CANCELLED: 'Жокко чыгарылды'
+        };
+
+        return values[status] || status || 'Жаңы заказ';
+    }
+
+    function paymentStatusText(status) {
+        const values = {
+            WAITING_PAYMENT: 'Төлөм күтүлүүдө',
+            WAITING: 'Төлөм күтүлүүдө',
+            PAID: 'Төлөндү'
+        };
+
+        return values[status] || status || 'Төлөм күтүлүүдө';
+    }
+
+    function paymentStatusClass(status) {
+        if (status === 'PAID') {
+            return 'status-paid';
+        }
+
+        return 'status-waiting';
+    }
+
+    function statusClass(status) {
+        const values = {
+            NEW: 'status-new',
+            ACCEPTED: 'status-accepted',
+            COOKING: 'status-cooking',
+            READY: 'status-ready',
+            GIVEN_TO_COURIER: 'status-courier',
+            DELIVERED: 'status-delivered',
+            CANCELLED: 'status-cancelled'
+        };
+
+        return values[status] || 'status-new';
+    }
+
+    function money(value) {
+        return Number(value || 0).toLocaleString('ru-RU', {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return 'Жаңы заказ';
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function showLoading(containerId, text) {
+        document.getElementById(containerId).innerHTML = `
+            <div class="state">
+                <div class="state-icon">⏳</div>
+                <div class="state-title">${escapeHtml(text)}</div>
+                <div class="state-text">Бир аз күтө туруңуз</div>
+            </div>
+        `;
+    }
+
+    function showError(containerId, text) {
+        document.getElementById(containerId).innerHTML = `
+            <div class="state">
+                <div class="state-icon">⚠️</div>
+                <div class="state-title">Ката чыкты</div>
+                <div class="state-text">${escapeHtml(text)}</div>
+            </div>
+        `;
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('toast');
+
+        toast.textContent = text;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    function notifyNewOrder(count) {
+        playNotificationSound();
+        showToast('🔔 ' + count + ' жаңы заказ келди!');
+
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Жаңы заказ!', {
+                body: count + ' жаңы заказ ресторанга түштү',
+                icon: '🍽'
+            });
+        }
+    }
+
+    function playNotificationSound() {
+        try {
+            const audioContext =
+                new (window.AudioContext || window.webkitAudioContext)();
+
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 880;
+            gain.gain.value = 0.12;
+
+            oscillator.start();
+            setTimeout(() => {
+                oscillator.stop();
+                audioContext.close();
+            }, 250);
+        } catch (error) {
+            console.log('Үн билдирүү иштебedi');
+        }
+    }
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+
+    loadActiveOrders();
+
+    setInterval(() => {
+        if (currentScreen === 'orders') {
+            loadActiveOrders(true);
+        }
+    }, 5000);
+</script>
+</body>
+</html>

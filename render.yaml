@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: restaurant-order-service
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+    disk:
+      name: restaurant-data
+      mountPath: /app/data
+      sizeGB: 1
