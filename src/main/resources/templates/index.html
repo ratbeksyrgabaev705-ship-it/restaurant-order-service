@@ -285,6 +285,13 @@
             -webkit-box-orient: vertical;
         }
 
+        .food-weight {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
         .food-bottom {
             display: flex;
             align-items: center;
@@ -627,6 +634,7 @@
             notFoundTitle: 'Тамак табылган жок',
             notFoundText: 'Башка сөз менен издеп көрүңүз.',
             ingredientsMissing: 'Курамы көрсөтүлгөн эмес',
+            grams: 'г',
             food: 'Тамак',
             menuError: 'Менюну алуу мүмкүн болгон жок',
             errorTitle: 'Ката чыкты'
@@ -648,6 +656,7 @@
             notFoundTitle: 'Блюдо не найдено',
             notFoundText: 'Попробуйте ввести другое название.',
             ingredientsMissing: 'Состав не указан',
+            grams: 'г',
             food: 'Блюдо',
             menuError: 'Не удалось загрузить меню',
             errorTitle: 'Произошла ошибка'
@@ -1306,6 +1315,15 @@
 
         const name = getLocalizedName(item);
         const description = getLocalizedDescription(item);
+        const weight = Number(item.weight || 0);
+        const weightHtml =
+            weight > 0
+                ? `
+                    <div class="food-weight">
+                        ${weight} ${escapeHtml(t('grams'))}
+                    </div>
+                `
+                : '';
         const quantity = getItemQuantity(item);
         const itemId = Number(item.id);
         const available = isItemAvailable(item);
@@ -1390,6 +1408,8 @@
                     <div class="food-description">
                         ${escapeHtml(description)}
                     </div>
+
+                    ${weightHtml}
 
                     <div class="food-bottom">
                         <div class="price">
