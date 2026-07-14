@@ -375,9 +375,9 @@
             </button>
 
             <div>
-                <div class="header-title">Себет</div>
+                <div id="headerTitle" class="header-title">Себет</div>
 
-                <div class="header-subtitle">
+                <div id="headerSubtitle" class="header-subtitle">
                     Тандалган тамактарды текшериңиз
                 </div>
             </div>
@@ -391,13 +391,14 @@
 
             <div class="empty-icon">🛒</div>
 
-            <div class="empty-title">Себет бош</div>
+            <div id="emptyTitle" class="empty-title">Себет бош</div>
 
-            <div class="empty-text">
+            <div id="emptyText" class="empty-text">
                 Менюдан каалаган тамактарыңызды тандаңыз.
             </div>
 
             <button
+                    id="emptyMenuButton"
                     class="menu-button"
                     onclick="window.location.href='/'"
             >
@@ -425,12 +426,12 @@
                 <div class="summary">
 
                     <div class="summary-row">
-                        <span>Товарлардын баасы</span>
+                        <span id="foodTotalLabel">Товарлардын баасы</span>
                         <strong id="foodTotal">0 сом</strong>
                     </div>
 
                     <div class="summary-row summary-total">
-                        <span>Жалпы сумма</span>
+                        <span id="totalPriceLabel">Жалпы сумма</span>
                         <strong id="totalPrice">0 сом</strong>
                     </div>
 
@@ -442,7 +443,7 @@
 
                 <div class="info-row">
 
-                    <div class="info-left">
+                    <div id="addressLabel" class="info-left">
                         📍 Жеткирүү дареги
                     </div>
 
@@ -451,14 +452,14 @@
                             class="info-button"
                             onclick="goToCheckout()"
                     >
-                        Кошуу ›
+                        <span class="add-info-text">Кошуу ›</span>
                     </button>
 
                 </div>
 
                 <div class="info-row">
 
-                    <div class="info-left">
+                    <div id="phoneLabel" class="info-left">
                         📞 Телефон номери
                     </div>
 
@@ -467,14 +468,14 @@
                             class="info-button"
                             onclick="goToCheckout()"
                     >
-                        Кошуу ›
+                        <span class="add-info-text">Кошуу ›</span>
                     </button>
 
                 </div>
 
                 <div class="info-row">
 
-                    <div class="info-left">
+                    <div id="nameLabel" class="info-left">
                         👤 Аты-жөнү
                     </div>
 
@@ -483,7 +484,7 @@
                             class="info-button"
                             onclick="goToCheckout()"
                     >
-                        Кошуу ›
+                        <span class="add-info-text">Кошуу ›</span>
                     </button>
 
                 </div>
@@ -501,7 +502,7 @@
                 class="continue-button"
                 onclick="goToCheckout()"
         >
-            <span>Заказ берүү</span>
+            <span id="checkoutText">Заказ берүү</span>
             <span id="bottomTotal">0 сом</span>
         </button>
 
@@ -513,6 +514,105 @@
     let cart = JSON.parse(
         localStorage.getItem("cart")
     ) || [];
+
+    let currentLanguage =
+        localStorage.getItem("customerLanguage") || "ky";
+
+    const QUANTITY_STEP = 0.1;
+    const MIN_QUANTITY = 0.1;
+
+    const translations = {
+        ky: {
+            cart: "Себет",
+            cartSubtitle: "Тандалган тамактарды текшериңиз",
+            emptyCart: "Себет бош",
+            emptyText: "Менюдан каалаган тамактарыңызды тандаңыз.",
+            backToMenu: "Менюга кайтуу",
+            itemsInCart: "🛍 Себетиңизде {count} товар бар",
+            commentPlaceholder: "Комментарий: мисалы, пиязсыз даярдап коюңуз",
+            foodTotal: "Товарлардын баасы",
+            totalPrice: "Жалпы сумма",
+            address: "📍 Жеткирүү дареги",
+            phone: "📞 Телефон номери",
+            name: "👤 Аты-жөнү",
+            addInfo: "Кошуу ›",
+            checkout: "Заказ берүү",
+            defaultDescription: "Даамдуу тамак",
+            emptyAlert: "Себет бош!",
+            som: "сом"
+        },
+        ru: {
+            cart: "Корзина",
+            cartSubtitle: "Проверьте выбранные блюда",
+            emptyCart: "Корзина пуста",
+            emptyText: "Выберите блюда из меню.",
+            backToMenu: "Вернуться в меню",
+            itemsInCart: "🛍 В корзине: {count}",
+            commentPlaceholder: "Комментарий: например, без лука",
+            foodTotal: "Стоимость блюд",
+            totalPrice: "Итого",
+            address: "📍 Адрес доставки",
+            phone: "📞 Номер телефона",
+            name: "👤 Имя",
+            addInfo: "Добавить ›",
+            checkout: "Оформить заказ",
+            defaultDescription: "Вкусное блюдо",
+            emptyAlert: "Корзина пуста!",
+            som: "сом"
+        }
+    };
+
+    function t(key) {
+        return translations[currentLanguage][key] || key;
+    }
+
+    function roundQuantity(value) {
+        return Math.round(Number(value || 0) * 10) / 10;
+    }
+
+    function formatQuantity(value) {
+        const rounded = roundQuantity(value);
+
+        if (Number.isInteger(rounded)) {
+            return String(rounded);
+        }
+
+        return rounded.toFixed(1).replace(/\.0$/, "");
+    }
+
+    function changeQuantity(current, delta) {
+        return roundQuantity(Number(current || 0) + delta);
+    }
+
+    function getCartItemName(item) {
+        if (currentLanguage === "ru") {
+            return item.nameRu || item.name || item.nameKg || t("defaultDescription");
+        }
+
+        return item.nameKg || item.name || item.nameRu || t("defaultDescription");
+    }
+
+    function applyLanguage() {
+        document.documentElement.lang =
+            currentLanguage === "ru" ? "ru" : "ky";
+
+        document.getElementById("headerTitle").textContent = t("cart");
+        document.getElementById("headerSubtitle").textContent = t("cartSubtitle");
+        document.getElementById("emptyTitle").textContent = t("emptyCart");
+        document.getElementById("emptyText").textContent = t("emptyText");
+        document.getElementById("emptyMenuButton").textContent = t("backToMenu");
+        document.getElementById("cartComment").placeholder = t("commentPlaceholder");
+        document.getElementById("foodTotalLabel").textContent = t("foodTotal");
+        document.getElementById("totalPriceLabel").textContent = t("totalPrice");
+        document.getElementById("addressLabel").textContent = t("address");
+        document.getElementById("phoneLabel").textContent = t("phone");
+        document.getElementById("nameLabel").textContent = t("name");
+        document.getElementById("checkoutText").textContent = t("checkout");
+
+        document.querySelectorAll(".add-info-text").forEach((element) => {
+            element.textContent = t("addInfo");
+        });
+    }
 
     function saveCart() {
         localStorage.setItem(
@@ -551,15 +651,16 @@
 
         cart.forEach((item, index) => {
             const price = Number(item.price || 0);
-            const quantity = Number(item.quantity || 0);
+            const quantity = roundQuantity(item.quantity || 0);
             const itemTotal = price * quantity;
+            const itemName = getCartItemName(item);
 
             const imageHtml = item.image
                 ? `
                     <img
                         class="item-image"
                         src="${escapeHtml(item.image)}"
-                        alt="${escapeHtml(item.name)}"
+                        alt="${escapeHtml(itemName)}"
                         onerror="this.outerHTML='<div class=&quot;image-placeholder&quot;>🍲</div>'"
                     >
                 `
@@ -577,17 +678,15 @@
                     <div>
 
                         <div class="item-name">
-                            ${escapeHtml(item.name)}
+                            ${escapeHtml(itemName)}
                         </div>
 
                         <div class="item-description">
-                            ${escapeHtml(
-                                item.description || "Даамдуу тамак"
-                            )}
+                            ${escapeHtml(t("defaultDescription"))}
                         </div>
 
                         <div class="item-price">
-                            ${formatMoney(itemTotal)} сом
+                            ${formatMoney(itemTotal)} ${escapeHtml(t("som"))}
                         </div>
 
                     </div>
@@ -613,7 +712,7 @@
                             </button>
 
                             <span class="quantity-number">
-                                ${quantity}
+                                ${formatQuantity(quantity)}
                             </span>
 
                             <button
@@ -632,37 +731,40 @@
             `;
 
             foodTotal += itemTotal;
-            totalQuantity += quantity;
+            totalQuantity = roundQuantity(totalQuantity + quantity);
         });
 
         cartItems.innerHTML = html;
 
         document.getElementById("cartNotice").textContent =
-            "🛍 Себетиңизде " +
-            totalQuantity +
-            " товар бар";
+            t("itemsInCart").replace(
+                "{count}",
+                formatQuantity(totalQuantity)
+            );
 
         document.getElementById("foodTotal").textContent =
-            formatMoney(foodTotal) + " сом";
+            formatMoney(foodTotal) + " " + t("som");
 
         document.getElementById("totalPrice").textContent =
-            formatMoney(foodTotal) + " сом";
+            formatMoney(foodTotal) + " " + t("som");
 
         document.getElementById("bottomTotal").textContent =
-            formatMoney(foodTotal) + " сом";
+            formatMoney(foodTotal) + " " + t("som");
     }
 
     function increaseItem(index) {
-        cart[index].quantity++;
+        cart[index].quantity =
+            changeQuantity(cart[index].quantity, QUANTITY_STEP);
 
         saveCart();
         renderCart();
     }
 
     function decreaseItem(index) {
-        cart[index].quantity--;
+        cart[index].quantity =
+            changeQuantity(cart[index].quantity, -QUANTITY_STEP);
 
-        if (cart[index].quantity <= 0) {
+        if (cart[index].quantity < MIN_QUANTITY) {
             cart.splice(index, 1);
         }
 
@@ -679,7 +781,7 @@
 
     function goToCheckout() {
         if (cart.length === 0) {
-            alert("Себет бош!");
+            alert(t("emptyAlert"));
             return;
         }
 
@@ -721,6 +823,7 @@
             .replaceAll("'", "&#039;");
     }
 
+    applyLanguage();
     renderCart();
 </script>
 

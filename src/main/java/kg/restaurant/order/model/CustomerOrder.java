@@ -44,7 +44,7 @@ public class CustomerOrder {
     private String itemName;
 
 
-    private Integer quantity;
+    private Double quantity;
 
 
     private Double totalPrice;
@@ -239,7 +239,7 @@ public class CustomerOrder {
 
 
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
 
         return quantity;
     }
@@ -247,7 +247,7 @@ public class CustomerOrder {
 
 
     public void setQuantity(
-            Integer quantity
+            Double quantity
     ) {
 
         this.quantity = quantity;

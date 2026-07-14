@@ -53,7 +53,7 @@ public class CustomerOrderController {
             @RequestParam String address,
             @RequestParam(required = false) String comment,
             @RequestParam String itemName,
-            @RequestParam Integer quantity,
+            @RequestParam Double quantity,
             @RequestParam Double totalPrice,
             @RequestParam Double paymentAmount,
             @RequestParam("receipt") MultipartFile receipt

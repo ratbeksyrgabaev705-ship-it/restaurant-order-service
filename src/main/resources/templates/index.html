@@ -617,6 +617,27 @@
     let currentLanguage =
         localStorage.getItem('customerLanguage') || 'ky';
 
+    const QUANTITY_STEP = 0.1;
+    const MIN_QUANTITY = 0.1;
+
+    function roundQuantity(value) {
+        return Math.round(Number(value || 0) * 10) / 10;
+    }
+
+    function formatQuantity(value) {
+        const rounded = roundQuantity(value);
+
+        if (Number.isInteger(rounded)) {
+            return String(rounded);
+        }
+
+        return rounded.toFixed(1).replace(/\.0$/, '');
+    }
+
+    function changeQuantity(current, delta) {
+        return roundQuantity(Number(current || 0) + delta);
+    }
+
     const translations = {
         ky: {
             workingHours: 'Күн сайын 09:00 — 20:00',
@@ -905,7 +926,7 @@
 
         if (existingItem) {
             existingItem.quantity =
-                Number(existingItem.quantity || 0) + 1;
+                changeQuantity(existingItem.quantity, QUANTITY_STEP);
 
             existingItem.key = getMenuItemKey(item);
             existingItem.itemId = item.id;
@@ -947,7 +968,7 @@
 
         if (existingItem) {
             existingItem.quantity =
-                Number(existingItem.quantity || 0) + 1;
+                changeQuantity(existingItem.quantity, QUANTITY_STEP);
 
             existingItem.key = getMenuItemKey(item);
             existingItem.itemId = item.id;
@@ -978,9 +999,9 @@
         }
 
         cart[itemIndex].quantity =
-            Number(cart[itemIndex].quantity || 0) - 1;
+            changeQuantity(cart[itemIndex].quantity, -QUANTITY_STEP);
 
-        if (cart[itemIndex].quantity <= 0) {
+        if (cart[itemIndex].quantity < MIN_QUANTITY) {
             cart.splice(itemIndex, 1);
         }
 
@@ -1346,7 +1367,7 @@
                         −
                     </button>
 
-                    <span>${quantity}</span>
+                    <span>${formatQuantity(quantity)}</span>
 
                     <button
                             type="button"

@@ -846,6 +846,23 @@
 <script>
     const DELIVERY_PRICE = 0;
 
+    let currentLanguage =
+        localStorage.getItem("customerLanguage") || "ky";
+
+    function roundQuantity(value) {
+        return Math.round(Number(value || 0) * 10) / 10;
+    }
+
+    function formatQuantity(value) {
+        const rounded = roundQuantity(value);
+
+        if (Number.isInteger(rounded)) {
+            return String(rounded);
+        }
+
+        return rounded.toFixed(1).replace(/\.0$/, "");
+    }
+
     let cart = [];
     let foodTotal = 0;
     let orderTotal = 0;
@@ -1030,17 +1047,22 @@
 
             const itemName =
                 cart
-                    .map(item =>
-                        (item.name || "Тамак") +
-                        " x" +
-                        Number(item.quantity || 0)
-                    )
+                    .map(item => {
+                        const name =
+                            currentLanguage === "ru"
+                                ? (item.nameRu || item.name || item.nameKg || "Блюдо")
+                                : (item.nameKg || item.name || item.nameRu || "Тамак");
+
+                        return name + " x" + formatQuantity(item.quantity || 0);
+                    })
                     .join(", ");
 
             const totalQuantity =
                 cart.reduce(
                     (sum, item) =>
-                        sum + Number(item.quantity || 0),
+                        roundQuantity(
+                            sum + Number(item.quantity || 0)
+                        ),
                     0
                 );
 
