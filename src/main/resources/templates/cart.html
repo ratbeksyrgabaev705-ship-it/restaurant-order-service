@@ -57,6 +57,36 @@
             gap: 13px;
         }
 
+        .header-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--background);
+            flex-shrink: 0;
+        }
+
+        .language-button {
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .language-button.active {
+            background: var(--orange);
+            color: var(--white);
+        }
+
         .back-button {
             width: 42px;
             height: 42px;
@@ -374,12 +404,32 @@
                 ←
             </button>
 
-            <div>
+            <div class="header-main">
                 <div id="headerTitle" class="header-title">Себет</div>
 
                 <div id="headerSubtitle" class="header-subtitle">
                     Тандалган тамактарды текшериңиз
                 </div>
+            </div>
+
+            <div class="language-switcher">
+                <button
+                        type="button"
+                        id="kyButton"
+                        class="language-button active"
+                        onclick="changeLanguage('ky')"
+                >
+                    KG
+                </button>
+
+                <button
+                        type="button"
+                        id="ruButton"
+                        class="language-button"
+                        onclick="changeLanguage('ru')"
+                >
+                    RU
+                </button>
             </div>
 
         </div>
@@ -592,9 +642,38 @@
         return item.nameKg || item.name || item.nameRu || t("defaultDescription");
     }
 
+    function changeLanguage(language) {
+        currentLanguage = language;
+
+        localStorage.setItem(
+            "customerLanguage",
+            language
+        );
+
+        applyLanguage();
+        renderCart();
+    }
+
     function applyLanguage() {
         document.documentElement.lang =
             currentLanguage === "ru" ? "ru" : "ky";
+
+        document.title =
+            currentLanguage === "ru"
+                ? "Корзина — ага-ини"
+                : "Себет — ага-ини";
+
+        document.getElementById("kyButton")
+            .classList.toggle(
+                "active",
+                currentLanguage === "ky"
+            );
+
+        document.getElementById("ruButton")
+            .classList.toggle(
+                "active",
+                currentLanguage === "ru"
+            );
 
         document.getElementById("headerTitle").textContent = t("cart");
         document.getElementById("headerSubtitle").textContent = t("cartSubtitle");

@@ -1096,7 +1096,7 @@
 
             formData.append(
                 "quantity",
-                String(totalQuantity)
+                String(Math.max(1, Math.round(totalQuantity)))
             );
 
             formData.append(

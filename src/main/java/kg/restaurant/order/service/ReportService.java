@@ -81,9 +81,9 @@ public class ReportService {
     }
 
     private Map<String, Object> buildReportMap(List<CustomerOrder> orders, String dateLabel) {
-        double totalQuantity = 0;
+        int totalQuantity = 0;
         double totalRevenue = 0;
-        Map<String, Double> soldItems = new LinkedHashMap<>();
+        Map<String, Integer> soldItems = new LinkedHashMap<>();
 
         for (CustomerOrder order : orders) {
             totalQuantity += order.getQuantity() == null ? 0 : order.getQuantity();
@@ -108,7 +108,7 @@ public class ReportService {
         return report;
     }
 
-    private void addSoldItems(Map<String, Double> soldItems, String itemName, Double quantity) {
+    private void addSoldItems(Map<String, Integer> soldItems, String itemName, Integer quantity) {
         if (itemName == null || itemName.isBlank()) {
             return;
         }
@@ -120,19 +120,19 @@ public class ReportService {
             }
 
             String name = trimmed;
-            double itemQuantity = quantity == null ? 1 : quantity;
+            int itemQuantity = quantity == null ? 1 : quantity;
 
             int xIndex = trimmed.toLowerCase().lastIndexOf(" x");
             if (xIndex > 0) {
                 name = trimmed.substring(0, xIndex).trim();
                 try {
-                    itemQuantity = Double.parseDouble(trimmed.substring(xIndex + 2).trim().replace(',', '.'));
+                    itemQuantity = Integer.parseInt(trimmed.substring(xIndex + 2).trim());
                 } catch (NumberFormatException ignored) {
                     itemQuantity = quantity == null ? 1 : quantity;
                 }
             }
 
-            soldItems.merge(name, itemQuantity, Double::sum);
+            soldItems.merge(name, itemQuantity, Integer::sum);
         }
     }
 }
